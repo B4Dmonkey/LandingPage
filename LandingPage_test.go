@@ -23,9 +23,11 @@ func TestHandler(t *testing.T) {
 			status, http.StatusOK)
 	}
 
-	expectedSubstring := "<landing-page>"
-	if !strings.Contains(rr.Body.String(), expectedSubstring) {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expectedSubstring)
+	expectedSubstrings := []string{"htmx", "<landing-page>", "/join"}
+	for _, expectedSubstring := range expectedSubstrings {
+		if !strings.Contains(rr.Body.String(), expectedSubstring) {
+			t.Errorf("handler returned unexpected body: got %v want %v",
+				rr.Body.String(), expectedSubstring)
+		}
 	}
 }

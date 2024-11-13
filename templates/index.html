@@ -3,59 +3,86 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/htmx.org@2.0.2"></script>
     <title>Landing Page</title>
   </head>
   <body>
-    <landing-page>
-      <template shadowrootmode="closed">
-        <style>
-          :host {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-          }
-
-          main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-          }
-
-          .centered {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          }
-
-          .hero {
-            background-color: black;
-            float: left;
-            width: 100%;
-            height: 100%;
-          }
-
-          .cta {
-            float: right;
-            width: 100%;
-            height: 100%;
-          }
-        </style>
-        <main>
-          <slot name="hero" class="hero centered"></slot>
-          <slot name="cta" class="cta centered"></slot>
-        </main>
-      </template>
+    <page-landing id="page-landing">
       <section slot="hero"></section>
       <section slot="cta">
-        <form>
-            <input type="email" placeholder="Email" />
-            <button>Submit</button>
-          </form>
+        <form hx-post="/join" enctype="multipart/form-data" hx-target="#page-landing" hx-swap="outerHTML">
+          <label for="email">Email</label>
+          <input type="email" name="email" placeholder="Email" />
+          <button type="submit">Submit</button>
+        </form>
       </section>
-    </landing-page>
+    </page-landing>
   </body>
+  <template id="template-page-landing">
+    <style>
+      :host {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+      }
+
+      .centered {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .hero {
+        background-color: black;
+        float: left;
+        width: 100%;
+        height: 100%;
+      }
+
+      .cta {
+        float: right;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <main>
+      <slot name="hero" class="hero centered"></slot>
+      <slot name="cta" class="cta centered"></slot>
+    </main>
+  </template>
+  <script defer>
+    class HelloWorld extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      // attribute change
+      attributeChangedCallback(property, oldValue, newValue) {
+        if (oldValue === newValue) return;
+        this[property] = newValue;
+      }
+
+      // connect component
+      connectedCallback() {
+        const shadow = this.attachShadow({ mode: "open" });
+        const template = document
+          .getElementById("template-page-landing")
+          .content.cloneNode(true);
+
+        shadow.append(template);
+        htmx.process(shadow)
+      }
+    }
+    customElements.define("page-landing", HelloWorld);
+  </script>
 </html>
